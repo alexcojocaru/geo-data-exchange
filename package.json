@@ -1,0 +1,46 @@
+{
+  "name": "geo-data-exchange",
+  "version": "1.0.0",
+  "description": "Transform a GPX or Leaflet track to GeoJSON",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "jest",
+    "clean": "rm -rf dist",
+    "minify": "uglifyjs src/index.js --compress --mangle --warn --output dist/index.min.js",
+    "build-patch": "npm run clean && mkdir dist && npm run version:bump-patch --silent && cp src/index.js dist/index.js && npm run version:add --silent",
+    "build": "npm run clean && mkdir dist && npm run version:bump-minor --silent && cp src/index.js dist/index.js && npm run version:add --silent",
+    "version:add": "echo \"/* version: $(npm run version:extract --silent) , build time: $(date '+%Y-%m-%d %H:%M:%S') */\n$(cat dist/index.js)\" > dist/index.js",
+    "version:bump-patch": "npm version patch --no-git-tag-version --silent",
+    "version:bump-minor": "npm version minor --no-git-tag-version --silent",
+    "version:extract": "cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexcojocaru/geo-data-exchange.git"
+  },
+  "keywords": [
+    "geo",
+    "gpx",
+    "leaflet",
+    "track",
+    "geojson",
+    "exchange",
+    "transform",
+    "convert",
+    "altitude",
+    "elevation"
+  ],
+  "author": "Alex Cojocaru",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/alexcojocaru/geo-data-exchange/issues"
+  },
+  "homepage": "https://github.com/alexcojocaru/geo-data-exchange#readme",
+  "devDependencies": {
+    "jest": "26.6.3",
+    "uglify-js": "3.12.1"
+  },
+  "dependencies": {
+    "leaflet": "^1.5.0"
+  }
+}
