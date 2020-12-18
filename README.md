@@ -1,31 +1,33 @@
-# geo-data-exchange
-[![Build Status](https://travis-ci.org/alexcojocaru/geo-data-exchange.png?branch=master)](https://travis-ci.org/alexcojocaru/geo-data-exchange)
+# geo-data-exchange [![Build Status](https://travis-ci.org/alexcojocaru/geo-data-exchange.png?branch=master)](https://travis-ci.org/alexcojocaru/geo-data-exchange)
+
 Transform a GPX or Leaflet track to GeoJSON
 
 A Javascript UMD module to transform a GPX track or a Leaflet track
-(as an array of [LatLng](https://leafletjs.com/reference-1.7.1.html#latlng) points)
+(given as an array of [LatLng](https://leafletjs.com/reference-1.7.1.html#latlng) points)
 to a GeoJSON feature collection.
 The given points are grouped into features based on the elevation
 grade change between subsequent points in the track. Each feature is of type `LineString`
 and has an `attributeType` property set to its elevation grade level.
 The FeatureCollection element itself has a `records` property set to the feature count,
-as well as a `summary` property set to `gradient`. See the example below for details.
+as well as a `summary` property set to `gradient`.
+See the [example below](#feature-collection-example) for details.
 
 The elevation grade levels are defined
 [here](https://github.com/alexcojocaru/geo-data-exchange/blob/master/src/index.js#L45-L56).
 
 Since the elevation coordinate on geo points is usually not very accurate,
-the elevation is normalized before grouping;
-the normalization process allows a certain degree of configuration via options.
+the elevations are normalized before points are grouped;
+the normalization process allows a certain degree of configuration via
+[options](#transformation-options).
 After grouping, the elevation interpolation is applied, if enabled via options:
-each points which lacks the elevation coordinate
-could have its elevation set using a process which looks at the elevation
-of its closest neighbours with elevation in the track and tries to estimate the elevation,
-considering a constant gradient between these points - this is not an accurate technique,
-and its results could be very far from reality.
+each point which lacks the elevation coordinate
+will have its elevation set using a process which looks at the elevation
+of its closest neighbours with elevation in the track and tries to estimate the elevation
+on the current point, considering a constant gradient between these points -
+this is not an accurate technique, and its results could be very far from reality.
 
-See below for an example of how such feature collection looks like.
-More example of such feature collections can be found in the
+<a name="feature-collection-example"></a>This is an example of how such a FeatureCollection
+looks like.  More examples of such feature collections can be found in the
 [unit tests](https://github.com/alexcojocaru/geo-data-exchange/blob/master/test/index.test.js).
 
 ```
@@ -72,9 +74,9 @@ The initial goal of this project was to make possible the generation of feature 
 the elevation grade level as grouping criterion.
 Here is an example of using such a feature collection to mark various grade levels on an elevation graph:
 
-<img width="600" src="https://github.com/alexcojocaru/geo-data-exchange/raw/master/resources/heightgraph.svg" alt="heightgraph" />
+<img width="600" src="https://raw.githubusercontent.com/alexcojocaru/geo-data-exchange/master/resources/heightgraph.png" alt="heightgraph" />
 
-*NB: GPX track to GeoJSON transformation is WIP.*
+*NB: The GPX track to GeoJSON transformation is WIP.*
 
 ## Usage
 
@@ -83,10 +85,10 @@ The main function is `buildGeojsonFeatures(latLngs, options)`
 exposed externally as `exports.buildGeojsonFeatures`,
 which takes an array of Leaflet LatLng `objects`, as well as an optional `options` object.
 
-There is a set of default transformation options
+<a name="transformation-options"></a>There is a set of default transformation options
 (documentation [here](https://github.com/alexcojocaru/geo-data-exchange/blob/master/src/index.js#L10-L38)),
 exposed externally as `exports.defaultOptions`,
-which could be used as prototype for creating custom options to pass to transformation function.
+which could be used as prototype for creating custom options to pass to the transformation function.
 
 There are more functions, not documented, exposed externally via the `internal` namespace,
 mainly for visibility for unit testing;
@@ -97,10 +99,9 @@ since they are internal, they might change at any time, even between patch versi
 
 ## Build
 
-The artifact is created in the *dist* directory.
-The code is not minified; after minification with uglify-js, even with the mangle and compress options disabled,
-the IIFE did not work as expected.
-
+The artifact is generated in the *dist* directory.
+The code is not minified; that is because after minification with uglify-js,
+even with the mangle and compress options disabled, the IIFE did not work as expected.
 
 #### Build a patch version
 ```
