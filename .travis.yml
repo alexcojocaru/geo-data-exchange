@@ -5,5 +5,5 @@ script:
   - echo 'Build starts'
   - echo 'Installing Deps'
   - npm install
-  - echo 'Testing'
-  - npm run test
+  - echo 'Testing with minimum coverage threshold enforcement'
+  - npm run test-coverage

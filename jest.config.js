@@ -40,9 +40,24 @@ module.exports = {
   //   "lcov",
   //   "clover"
   // ],
+  coverageReporters: [
+    "json",
+    "json-summary",
+    "text",
+    "lcov",
+    "clover"
+  ],
 
   // An object that configures minimum threshold enforcement for coverage results
   // coverageThreshold: undefined,
+  coverageThreshold: {
+      global: {
+          branches: 96,
+          functions: 100,
+          lines: 98,
+          statements: 98
+      }
+  },
 
   // A path to a custom dependency extractor
   // dependencyExtractor: undefined,

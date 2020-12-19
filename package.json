@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "jest",
+    "test-coverage": "jest --coverage && node resources/test-coverage-parser.js",
     "clean": "rm -rf dist",
     "minify": "uglifyjs src/index.js --compress --mangle --warn --output dist/index.min.js",
     "build-patch": "npm run clean && mkdir dist && npm run version:bump-patch --silent && cp src/index.js dist/index.js && npm run version:add --silent",
@@ -38,6 +39,7 @@
   "homepage": "https://github.com/alexcojocaru/geo-data-exchange#readme",
   "devDependencies": {
     "jest": "26.6.3",
+    "replace-in-file": "6.1.0",
     "uglify-js": "3.12.1"
   },
   "dependencies": {

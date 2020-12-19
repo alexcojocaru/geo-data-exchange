@@ -1,4 +1,4 @@
-# geo-data-exchange [![Build Status](https://travis-ci.org/alexcojocaru/geo-data-exchange.png?branch=master)](https://travis-ci.org/alexcojocaru/geo-data-exchange)
+# geo-data-exchange [![Build Status](https://travis-ci.org/alexcojocaru/geo-data-exchange.png?branch=master)](https://travis-ci.org/alexcojocaru/geo-data-exchange) coverage: [98%](#test-coverage-report)
 
 Transform a GPX or Leaflet track to GeoJSON
 
@@ -111,5 +111,28 @@ $ npm run build-patch
 #### Build a minor version
 ```
 $ npm run build
+```
+
+## Test
+
+Run the unit tests with
+```
+$ npm run test
+```
+or, even better, run them with coverage reporting enabled
+```
+$ npm run test-coverage
+```
+
+## <a name="test-coverage"></a>Test coverage
+Every time the tests are run with coverage reporting enabled,
+the custom coverage "badge" in the title gets updated with the aggregated summary.
+The summary is also inserted below:
+<a name="test-coverage-report"></a>
+```
+  % Statements: 99
+  %   Branches: 96
+  %  Functions: 100
+  %      Lines: 99
 ```
 

@@ -1,5 +1,6 @@
 TODO
-jest.config.js
+coverage
 src
-test
 resources
+test
+jest.config.js

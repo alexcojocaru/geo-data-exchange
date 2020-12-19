@@ -668,6 +668,10 @@ describe("geo-data-exchange", () => {
                 .toEqual(expectedDistance);
     });
 
+    //
+    // Calculate gradient
+    //
+
     test("calculate gradient - not enough points", () => {
         expect(exchange.internal._calculateGradient([])).toEqual(0);
         expect(exchange.internal._calculateGradient([ L.latLng(1, 1, 1) ])).toEqual(0);
@@ -719,6 +723,14 @@ describe("geo-data-exchange", () => {
         expect(exchange.internal._calculateGradient(latLngs)).toEqual(0);
     });
 
+    test("calculate gradient - duplicate points", () => {
+        var latLngs = [
+            L.latLng(2, 2, 20),
+            L.latLng(2, 2, 20)
+        ];
+        expect(exchange.internal._calculateGradient(latLngs)).toEqual(0);
+    });
+
     test("calculate gradient - points at start have no altitude", () => {
         var latLngs = [
             L.latLng(1, 1),
@@ -756,6 +768,22 @@ describe("geo-data-exchange", () => {
             L.latLng(3, 3)
         ];
         expect(exchange.internal._calculateGradient(latLngs)).toEqual(2);
+    });
+
+    test("calculate gradient - duplicate points", () => {
+        var latLngsNoDuplicate = [
+            L.latLng(2.001, 2.001, 100),
+            L.latLng(2.0015, 2.0015, 105)
+        ];
+        var gradient = exchange.internal._calculateGradient(latLngsNoDuplicate);
+
+        var latLngsDuplicate = [
+            L.latLng(2.001, 2.001, 100),
+            L.latLng(2.001, 2.001, 100),
+            L.latLng(2.0015, 2.0015, 105)
+        ];
+
+        expect(exchange.internal._calculateGradient(latLngsDuplicate)).toEqual(gradient);
     });
 
     //
@@ -924,6 +952,34 @@ describe("geo-data-exchange", () => {
                    L.latLng(1, 1, 1),
                    L.latLng(2, 2, 2),
                    L.latLng(3, 3, 3)
+               ]);
+    });
+
+    test("interpolate when duplicate point with elevation", () => {
+        var latLngs = [
+            L.latLng(1.001, 1.001, 1),
+            L.latLng(1.002, 1.002),
+            L.latLng(1.001, 1.001, 1)
+        ];
+        expect(exchange.internal._interpolateElevation(latLngs, true))
+               .toEqual([
+                    L.latLng(1.001, 1.001, 1),
+                    L.latLng(1.002, 1.002, 1),
+                    L.latLng(1.001, 1.001, 1)
+               ]);
+    });
+
+    test("interpolate when duplicate point with and without elevation", () => {
+        var latLngs = [
+            L.latLng(1.001, 1.001, 1),
+            L.latLng(1.001, 1.001),
+            L.latLng(1.001, 1.001, 1)
+        ];
+        expect(exchange.internal._interpolateElevation(latLngs, true))
+               .toEqual([
+                    L.latLng(1.001, 1.001, 1),
+                    L.latLng(1.001, 1.001, 1),
+                    L.latLng(1.001, 1.001, 1)
                ]);
     });
 
