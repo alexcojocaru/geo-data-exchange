@@ -105,14 +105,21 @@ The artifact is generated in the *dist* directory.
 The code is not minified; that is because after minification with uglify-js,
 even with the mangle and compress options disabled, the IIFE did not work as expected.
 
-#### Build a patch version
-```
-$ npm run build-patch
-```
-
-#### Build a minor version
+#### Build a package
 ```
 $ npm run build
+```
+
+## Release
+
+#### Build a minor release
+```
+$ npm run release
+```
+
+#### Build a patch release
+```
+$ npm run release-patch
 ```
 
 ## Test
