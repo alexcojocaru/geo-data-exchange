@@ -117,11 +117,11 @@ $ npm run build
 
 ## Test
 
-Run the unit tests with
+Run the unit tests with:
 ```
 $ npm run test
 ```
-or, even better, run them with coverage reporting enabled
+or, even better, run them with coverage reporting enabled:
 ```
 $ npm run test-coverage
 ```
