@@ -11,13 +11,13 @@
     "build-patch": "npm run clean && mkdir dist && npm run version:bump-patch --silent && cp src/index.js dist/index.js && npm run version:add --silent",
     "build": "npm run clean && mkdir dist && npm run version:bump-minor --silent && cp src/index.js dist/index.js && npm run version:add --silent",
     "version:add": "echo \"/* version: $(npm run version:extract --silent) , build time: $(date '+%Y-%m-%d %H:%M:%S') */\n$(cat dist/index.js)\" > dist/index.js",
-    "version:bump-patch": "npm version patch --no-git-tag-version --silent",
-    "version:bump-minor": "npm version minor --no-git-tag-version --silent",
+    "version:bump-patch": "npm version patch --silent",
+    "version:bump-minor": "npm version minor --silent",
     "version:extract": "cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]'"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/alexcojocaru/geo-data-exchange.git"
+    "url": "https://github.com/alexcojocaru/geo-data-exchange.git"
   },
   "keywords": [
     "geo",
