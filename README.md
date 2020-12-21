@@ -82,6 +82,20 @@ Here is an example of using such a feature collection to mark various grade leve
 
 ## Usage
 
+The module is not published to the npm registry because of
+[its leaking users' email addresses](https://github.com/npm/www/issues/16).
+Instead, it can be referenced it's
+[Github URL](https://docs.npmjs.com/cli/v6/configuring-npm/package-json#github-urls)).
+
+First, add this module as a dependency to your project:
+```
+$ npm install alexcojocaru/geo-data-exchange
+```
+or, if you want a specific version/commit/branch (e.g. v1.1.0):
+```
+$ npm install alexcojocaru/geo-data-exchange#v1.1.0
+```
+
 The main function is `buildGeojsonFeatures(latLngs, options)`
 (documentation [here](https://github.com/alexcojocaru/geo-data-exchange/blob/master/src/index.js#L41-L79)),
 exposed externally as `exports.buildGeojsonFeatures`,
@@ -116,6 +130,9 @@ $ npm run build
 ```
 $ npm run release
 ```
+
+*NB: If the release script fails to run, check that there are no files modified locally,
+in which case commit them or clean them up before running the release.*
 
 #### Build a patch release
 ```

@@ -37,7 +37,7 @@ function replaceInFile(overall, statements, branches, functions, lines) {
     const options = {
         files: path.join(__dirname, "../README.md"),
         from: [
-            /coverage: \[(\d+|N\/A)\]/,
+            /coverage: \[([\d\.%]+|N\/A)\]/,
             /<a name="test-coverage-report"><\/a>\s+```\s+(.+)\s+(.+)\s+(.+)\s+(.+)\s+```/m,
         ],
         to: [
