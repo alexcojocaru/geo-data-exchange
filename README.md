@@ -124,21 +124,6 @@ even with the mangle and compress options disabled, the IIFE did not work as exp
 $ npm run build
 ```
 
-## Release
-
-#### Build a minor release
-```
-$ npm run release
-```
-
-*NB: If the release script fails to run, check that there are no files modified locally,
-in which case commit them or clean them up before running the release.*
-
-#### Build a patch release
-```
-$ npm run release-patch
-```
-
 ## Test
 
 Run the unit tests with:
@@ -161,5 +146,30 @@ the overall coverage at the top of the README is updated, along with the summary
   %   Branches: 96
   %  Functions: 100
   %      Lines: 99
+```
+
+## <a name="release"></a>Release
+
+#### Build a minor release
+```
+$ npm run release
+```
+
+*NB: If the release script fails to run, check that there are no files modified locally,
+in which case commit them or clean them up before running the release.*
+
+#### Build a patch release
+```
+$ npm run release-patch
+```
+
+## Publish
+
+To publish a release, first [build it](#release) - that creates the dist file(s),
+increments the version number, commits and creates the git tag.
+After, push the newer commit(s), along with the new tag, to the server:
+```
+git push origin HEAD
+git push origin <tag_name>
 ```
 
