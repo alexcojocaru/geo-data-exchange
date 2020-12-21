@@ -84,7 +84,7 @@ Here is an example of using such a feature collection to mark various grade leve
 
 The module is not published to the npm registry because of
 [its leaking users' email addresses](https://github.com/npm/www/issues/16).
-Instead, it can be referenced it's
+Instead, it can be referenced via it's
 [Github URL](https://docs.npmjs.com/cli/v6/configuring-npm/package-json#github-urls)).
 
 First, add this module as a dependency to your project:
