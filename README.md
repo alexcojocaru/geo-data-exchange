@@ -1,6 +1,6 @@
 # geo-data-exchange
 
-[![Build Status](https://travis-ci.org/alexcojocaru/geo-data-exchange.png?branch=master)](https://travis-ci.org/alexcojocaru/geo-data-exchange) , coverage: [98%](#test-coverage-report)
+![Build Status](https://github.com/alexcojocaru/geo-data-exchange/actions/workflows/node.js.yml/badge.svg) , coverage: [98%](#test-coverage-report)
 
 Transform a GPX or Leaflet track to GeoJSON
 
