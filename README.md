@@ -1,6 +1,6 @@
 # geo-data-exchange
 
-[![Build Status](https://github.com/alexcojocaru/geo-data-exchange/actions/workflows/node.js.yml/badge.svg)](https://github.com/alexcojocaru/geo-data-exchange/actions) , coverage: [98%](#test-coverage-report)
+[![Node.js CI](https://github.com/alexcojocaru/geo-data-exchange/actions/workflows/node.js.yml/badge.svg)](https://github.com/alexcojocaru/geo-data-exchange/actions/workflows/node.js.yml) , coverage: [98%](#test-coverage-report)
 
 Transform a GPX or Leaflet track to GeoJSON
 
