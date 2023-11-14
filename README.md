@@ -88,9 +88,9 @@ First, add this module as a dependency to your project:
 ```
 $ npm install alexcojocaru/geo-data-exchange
 ```
-or, if you want a specific version/commit/branch (e.g. v2.1.0):
+or, if you want a specific version/commit/branch (e.g. v2.0.0):
 ```
-$ npm install alexcojocaru/geo-data-exchange#v2.1.0
+$ npm install alexcojocaru/geo-data-exchange#v2.0.0
 ```
 
 The main function is `buildGeojsonFeatures(latLngs, options)`
