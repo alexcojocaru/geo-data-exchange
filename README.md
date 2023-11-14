@@ -15,18 +15,15 @@ as well as a `summary` property set to `gradient`.
 See the [example below](#feature-collection-example) for details.
 
 The elevation grade levels are defined
-[here](https://github.com/alexcojocaru/geo-data-exchange/blob/master/src/index.js#L45-L56).
+[here](https://github.com/alexcojocaru/geo-data-exchange/blob/master/src/index.js#L24-L35).
 
-Since the elevation coordinate on geo points is usually not very accurate,
-the elevations are normalized before points are grouped;
-the normalization process allows a certain degree of configuration via
-[options](#transformation-options).
-After grouping, the elevation interpolation is applied, if enabled via options:
-each point which lacks the elevation coordinate
-will have its elevation set using a process which looks at the elevation
-of its closest neighbours with elevation in the track and tries to estimate the elevation
-on the current point, considering a constant gradient between these points -
-this is not an accurate technique, and its results could be very far from reality.
+Since it is quite possible that some points on the GPX track do not have an elevation
+coordinate, the track grades are calculated using only the points with elevation.
+After this, the elevation interpolation is applied (if enabled via options) as follows:
+given a point _B_ without elevation between two points _A_ and _C_ with elevation,
+the algorithm calculates the gradient _GR_ between _A_ and _C_, and interpolates the elevation
+for _B_, so that the gradient between _A_ and _B_ is _GR_ and between _B_ and _C_ is also _GR_.
+This is not an accurate technique, and its results could be far from reality.
 
 <a name="feature-collection-example"></a>This is an example of how such a FeatureCollection
 looks like.  More examples of such feature collections can be found in the
@@ -72,8 +69,8 @@ looks like.  More examples of such feature collections can be found in the
 }]
 ```
 
-The initial goal of this project was to make possible the generation of feature collections, using
-the elevation grade level as grouping criterion.
+The initial goal of this project was to enable the generation of feature collections,
+using the elevation grade level for grouping.
 Here is an example of using such a feature collection to mark various grade levels on an elevation graph:
 
 <img width="600" src="https://raw.githubusercontent.com/alexcojocaru/geo-data-exchange/master/resources/heightgraph.png" alt="heightgraph" />
@@ -91,18 +88,18 @@ First, add this module as a dependency to your project:
 ```
 $ npm install alexcojocaru/geo-data-exchange
 ```
-or, if you want a specific version/commit/branch (e.g. v1.1.0):
+or, if you want a specific version/commit/branch (e.g. v2.1.0):
 ```
-$ npm install alexcojocaru/geo-data-exchange#v1.1.0
+$ npm install alexcojocaru/geo-data-exchange#v2.1.0
 ```
 
 The main function is `buildGeojsonFeatures(latLngs, options)`
-(documentation [here](https://github.com/alexcojocaru/geo-data-exchange/blob/master/src/index.js#L41-L79)),
+(documentation [here](https://github.com/alexcojocaru/geo-data-exchange/blob/master/src/index.js#L20-L57)),
 exposed externally as `exports.buildGeojsonFeatures`,
 which takes an array of Leaflet LatLng `objects`, as well as an optional `options` object.
 
 <a name="transformation-options"></a>There is a set of default transformation options
-(documentation [here](https://github.com/alexcojocaru/geo-data-exchange/blob/master/src/index.js#L10-L38)),
+(documentation [here](https://github.com/alexcojocaru/geo-data-exchange/blob/master/src/index.js#L10-L17)),
 exposed externally as `exports.defaultOptions`,
 which could be used as prototype for creating custom options to pass to the transformation function.
 

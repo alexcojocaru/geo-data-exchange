@@ -3,171 +3,19 @@ require("leaflet");
 
 describe("geo-data-exchange", () => {
 
-    test("build features - empty points list", () => {
-        var latLngs = [];
-
-        var result = exchange.buildGeojsonFeatures(latLngs);
-
-        expect(result).toEqual(
-            [{
-                type: "FeatureCollection",
-                features: [],
-                properties: {
-                    Creator: "github.com/alexcojocaru/geo-data-exchange",
-                    records: 0,
-                    summary: "gradient"
-                }
-            }]
-        );
-    });
-
-    test("build features - no options provided", () => {
-        var latLngs = [
-            L.latLng(1.111, 2.221, 1),
-            L.latLng(1.113, 2.223),
-            // the altitude on the above will not get interpolated,
-            // hence the point will count for distance calculation
-            L.latLng(1.115, 2.225, 5),
-            // > 200m so far; current gradient is 0; restart with the last
-            L.latLng(1.117, 2.227, 70)
-            // > 200m so far; new segment, for the current gradient is 5
-        ];
-        expect(exchange.buildGeojsonFeatures(latLngs))
-                .toEqual([{
-                    "features": [
-                        {
-                            "geometry": {
-                                "coordinates": [
-                                    [2.221, 1.111, 1],
-                                    [2.223, 1.113, undefined],
-                                    [2.225, 1.115, 5]
-                                ],
-                                "type": "LineString"
-                            },
-                            "properties": {
-                                "attributeType": 0
-                            },
-                            "type": "Feature"
-                        },
-                        {
-                            "geometry": {
-                                "coordinates": [
-                                    [2.225, 1.115, 5],
-                                    [2.227, 1.117, 70]
-                                ],
-                                "type": "LineString"
-                            },
-                            "properties": {
-                                "attributeType": 5
-                            },
-                            "type": "Feature"
-                        }
-                    ],
-                    "properties": {
-                        "Creator": "github.com/alexcojocaru/geo-data-exchange",
-                        "records": 2,
-                        "summary": "gradient"
-                    },
-                    "type": "FeatureCollection"
-                }]);
-    });
-
-    test("build features - all options provided", () => {
-        var latLngs = [
-            L.latLng(1.108, 2.218),
-            // the altitude on this will get interpolated to 8
-            L.latLng(1.110, 2.220, 8),
-            // > 300m so far, but previous point has interpolated altitude; no new segment
-            L.latLng(1.113, 2.223, 10),
-            // > 300m so far; new segment; gradient = 0; restart with last point
-            L.latLng(1.116, 2.226),
-            // < 300m so far; the elevation will get interpolated to 760
-            L.latLng(1.117, 2.227, 1010),
-            // > 300m so far; new segment; gradient = 5; restart with last point
-            L.latLng(1.127, 2.237, 1011)
-            // > 300m so far; new segment; gradient = 0
-        ];
-        var options = {
-            segments: 100,
-            minSegmentDistance: 300,
-            interpolateElevation: true
-        };
-        var result = exchange.buildGeojsonFeatures(latLngs, options);
-
-        expect(result).toEqual([{
+    test("build geo json features - missing options", () => {
+        expect(
+            exchange.buildGeojsonFeatures([
+                L.latLng(1, 11),
+                L.latLng(2, 22, 222)
+            ])
+        ).toEqual([{
             "features": [
                 {
                     "geometry": {
                         "coordinates": [
-                            [2.218, 1.108, 8],
-                            [2.220, 1.110, 8],
-                            [2.223, 1.113, 10]
-                        ],
-                        "type": "LineString"
-                    },
-                    "properties": {
-                        "attributeType": 0
-                    },
-                    "type": "Feature"
-                },
-                {
-                    "geometry": {
-                        "coordinates": [
-                            [2.223, 1.113, 10],
-                            [2.226, 1.116, 760],
-                            [2.227, 1.117, 1010]
-                        ],
-                        "type": "LineString"
-                    },
-                    "properties": {
-                        "attributeType": 5
-                    },
-                    "type": "Feature"
-                },
-                {
-                    "geometry": {
-                        "coordinates": [
-                            [2.227, 1.117, 1010],
-                            [2.237, 1.127, 1011],
-                        ],
-                        "type": "LineString"
-                    },
-                    "properties": {
-                        "attributeType": 0
-                    },
-                    "type": "Feature"
-                }
-            ],
-            "properties": {
-                "Creator": "github.com/alexcojocaru/geo-data-exchange",
-                "records": 3,
-                "summary": "gradient"
-            },
-            "type": "FeatureCollection"
-        }]);
-    });
-
-    test("build features - some options provided", () => {
-        var latLngs = [
-            L.latLng(1.108, 2.218),
-            // the altitude on this will get interpolated to 8
-            L.latLng(1.110, 2.220, 8),
-            // > 200m so far, but previous point has interpolated altitude; no new segment
-            L.latLng(1.112, 2.222)
-        ];
-        var options = {
-            interpolateElevation: true
-        };
-        var result = exchange.buildGeojsonFeatures(latLngs, options);
-
-        expect(result).toEqual([{
-            "features": [
-                {
-                    "geometry": {
-                        "coordinates": [
-                            [2.218, 1.108, 8],
-                            [2.220, 1.110, 8],
-                            [2.222, 1.112, 8]
+                            [11, 1, undefined],
+                            [22, 2, 222]
                         ],
                         "type": "LineString"
                     },
@@ -186,29 +34,23 @@ describe("geo-data-exchange", () => {
         }]);
     });
 
-    test("build features - enforce minSegmentDistance", () => {
-        var latLngs = [
-            L.latLng(1.108, 2.218, 8),
-            L.latLng(1.1085, 2.2185, 8),
-            // 10m apart (> 10m, but < 50 min enforced), no new segment
-            L.latLng(1.110, 2.220, 10),
-            // > 50m so far, new segment; gradient = 0
-            L.latLng(1.112, 2.222, 20)
-            // > 50m so far, new segment; gradient = 1
-        ];
-        var options = {
-            minSegmentDistance: 10
-        };
-        var result = exchange.buildGeojsonFeatures(latLngs, options);
-
-        expect(result).toEqual([{
+    test("build geo json features - interpolate elevation", () => {
+        expect(
+            exchange.buildGeojsonFeatures(
+                [
+                    L.latLng(1, 11),
+                    L.latLng(2, 22, 222),
+                    L.latLng(2.1, 22.1, 2220),
+                ],
+                { interpolateElevation: true }
+            )
+        ).toEqual([{
             "features": [
                 {
                     "geometry": {
                         "coordinates": [
-                            [2.218, 1.108, 8],
-                            [2.2185, 1.1085, 8],
-                            [2.220, 1.110, 10]
+                            [11, 1, 222],
+                            [22, 2, 222]
                         ],
                         "type": "LineString"
                     },
@@ -220,13 +62,13 @@ describe("geo-data-exchange", () => {
                 {
                     "geometry": {
                         "coordinates": [
-                            [2.220, 1.110, 10],
-                            [2.222, 1.112, 20]
+                            [22, 2, 222],
+                            [22.1, 2.1, 2220]
                         ],
                         "type": "LineString"
                     },
                     "properties": {
-                        "attributeType": 1
+                        "attributeType": 4
                     },
                     "type": "Feature"
                 }
@@ -240,396 +82,682 @@ describe("geo-data-exchange", () => {
         }]);
     });
 
-    test("build features - union segments with same gradient", () => {
-        var latLngs = [
-            L.latLng(1.108, 2.218, 8),
-            L.latLng(1.110, 2.220, 9),
-            // > 200m so far, new segment; gradient = 0
-            L.latLng(1.112, 2.222, 12),
-            // > 200m so far, new segment; gradient = 0
-            L.latLng(1.114, 2.224, 20),
-            // > 200m so far, new segment; gradient = 1
-            L.latLng(1.117, 2.227, 22)
-            // > 200m so far, new segment; gradient = 0
-        ];
-        var result = exchange.buildGeojsonFeatures(latLngs);
+    test("build features - empty points list", () => {
+        expect(exchange.internal._buildFeatures([], false)).toEqual([]);
+    });
 
-        expect(result).toEqual([{
-            "features": [
-                {
-                    "geometry": {
-                        "coordinates": [
-                            [2.218, 1.108, 8],
-                            [2.220, 1.110, 9],
-                            [2.222, 1.112, 12]
-                        ],
-                        "type": "LineString"
-                    },
-                    "properties": {
-                        "attributeType": 0
-                    },
-                    "type": "Feature"
+    test("build features - one point list", () => {
+        expect(
+            exchange.internal._buildFeatures(
+                [
+                    L.latLng(1, 11)
+                ],
+                false
+            )
+        ).toEqual([
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11, 1, undefined]
+                    ],
+                    "type": "LineString"
                 },
-                {
-                    "geometry": {
-                        "coordinates": [
-                            [2.222, 1.112, 12],
-                            [2.224, 1.114, 20]
-                        ],
-                        "type": "LineString"
-                    },
-                    "properties": {
-                        "attributeType": 1
-                    },
-                    "type": "Feature"
+                "properties": {
+                    "attributeType": 0
                 },
-                {
-                    "geometry": {
-                        "coordinates": [
-                            [2.224, 1.114, 20],
-                            [2.227, 1.117, 22]
-                        ],
-                        "type": "LineString"
-                    },
-                    "properties": {
-                        "attributeType": 0
-                    },
-                    "type": "Feature"
-                }
-            ],
-            "properties": {
-                "Creator": "github.com/alexcojocaru/geo-data-exchange",
-                "records": 3,
-                "summary": "gradient"
+                "type": "Feature"
+            }
+        ]);
+    });
+
+    test("build features - one point list - interpolate", () => {
+        expect(
+            exchange.internal._buildFeatures(
+                [
+                    L.latLng(1, 11)
+                ],
+                true
+            )
+        ).toEqual([
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11, 1, 0]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 0
+                },
+                "type": "Feature"
+            }
+        ]);
+    });
+
+    test("build features - all points without altitude", () => {
+        expect(
+            exchange.internal._buildFeatures(
+                [
+                    L.latLng(1, 11),
+                    L.latLng(2, 22)
+                ],
+                false
+            )
+        ).toEqual([
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11, 1, undefined],
+                        [22, 2, undefined]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 0
+                },
+                "type": "Feature"
+            }
+        ]);
+    });
+
+    test("build features - single point with altitude", () => {
+        expect(
+            exchange.internal._buildFeatures(
+                [
+                    L.latLng(1, 11),
+                    L.latLng(2, 22),
+                    L.latLng(3, 33, 333)
+                ],
+                false
+            )
+        ).toEqual([
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11, 1, undefined],
+                        [22, 2, undefined],
+                        [33, 3, 333]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 0
+                },
+                "type": "Feature"
+            }
+        ]);
+    });
+
+    test("build features - single point with altitude - interpolate", () => {
+        expect(
+            exchange.internal._buildFeatures(
+                [
+                    L.latLng(1, 11),
+                    L.latLng(3, 33, 333)
+                ],
+                true
+            )
+        ).toEqual([
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11, 1, 333],
+                        [33, 3, 333]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 0
+                },
+                "type": "Feature"
+            }
+        ]);
+    });
+
+    test("build features - starting and ending points without altitude", () => {
+        expect(
+            exchange.internal._buildFeatures(
+                [
+                    L.latLng(1, 11),
+                    L.latLng(2, 22, 222),
+                    L.latLng(2.1, 22.1, 2220),
+                    L.latLng(3, 33),
+                ],
+                false
+            )
+        ).toEqual([
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11, 1, undefined],
+                        [22, 2, 222]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 0
+                },
+                "type": "Feature"
             },
-            "type": "FeatureCollection"
-        }]);
+            {
+                "geometry": {
+                    "coordinates": [
+                        [22, 2, 222],
+                        [22.1, 2.1, 2220]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 4
+                },
+                "type": "Feature"
+            },
+            {
+                "geometry": {
+                    "coordinates": [
+                        [22.1, 2.1, 2220],
+                        [33, 3, undefined]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 0
+                },
+                "type": "Feature"
+            }
+        ]);
+    });
+
+    test("build features - starting and ending points without altitude - interpolate", () => {
+        expect(
+            exchange.internal._buildFeatures(
+                [
+                    L.latLng(1, 11),
+                    L.latLng(2, 22, 222),
+                    L.latLng(2.1, 22.1, 2220),
+                    L.latLng(3, 33)
+                ],
+                true
+            )
+        ).toEqual([
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11, 1, 222],
+                        [22, 2, 222]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 0
+                },
+                "type": "Feature"
+            },
+            {
+                "geometry": {
+                    "coordinates": [
+                        [22, 2, 222],
+                        [22.1, 2.1, 2220]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 4
+                },
+                "type": "Feature"
+            },
+            {
+                "geometry": {
+                    "coordinates": [
+                        [22.1, 2.1, 2220],
+                        [33, 3, 2220]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 0
+                },
+                "type": "Feature"
+            }
+        ]);
+    });
+
+    test("build features - single gradient - no intermediate points without altitude", () => {
+        expect(
+            exchange.internal._buildFeatures(
+                [
+                    L.latLng(1, 11, 111),
+                    L.latLng(1.01, 11.01, 211),
+                    L.latLng(1.02, 11.02, 311)
+                ],
+                false
+            )
+        ).toEqual([
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11, 1, 111],
+                        [11.01, 1.01, 211],
+                        [11.02, 1.02, 311]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 2
+                },
+                "type": "Feature"
+            }
+        ]);
+    });
+
+    test("build features - single gradient - intermediate points without altitude", () => {
+        expect(
+            exchange.internal._buildFeatures(
+                [
+                    L.latLng(1, 11, 111),
+                    L.latLng(1.002, 11.002),
+                    L.latLng(1.005, 11.005),
+                    L.latLng(1.01, 11.01, 211),
+                    L.latLng(1.015, 11.015),
+                    L.latLng(1.02, 11.02, 311),
+                ],
+                false
+            )
+        ).toEqual([
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11, 1, 111],
+                        [11.002, 1.002, undefined],
+                        [11.005, 1.005, undefined],
+                        [11.01, 1.01, 211],
+                        [11.015, 1.015, undefined],
+                        [11.02, 1.02, 311]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 2
+                },
+                "type": "Feature"
+            }
+        ]);
+    });
+
+    test("build features - single gradient - intermediate points without altitude - interpolate", () => {
+        expect(
+            exchange.internal._buildFeatures(
+                [
+                    L.latLng(1, 11, 111),
+                    L.latLng(1.002, 11.002),
+                    L.latLng(1.005, 11.005),
+                    L.latLng(1.01, 11.01, 211)
+                ],
+                true
+            )
+        ).toEqual([
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11, 1, 111],
+                        [11.002, 1.002, 131],
+                        [11.005, 1.005, 161],
+                        [11.01, 1.01, 211]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 2
+                },
+                "type": "Feature"
+            }
+        ]);
+    });
+
+    test("build features - multi gradients - no intermediate points without altitude", () => {
+        expect(
+            exchange.internal._buildFeatures(
+                [
+                    L.latLng(1, 11, 111),
+                    L.latLng(1.01, 11.01, 211),
+                    L.latLng(1.02, 11.02, 411),
+                    L.latLng(1.03, 11.03, 611)
+                ],
+                false
+            )
+        ).toEqual([
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11, 1, 111],
+                        [11.01, 1.01, 211]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 2
+                },
+                "type": "Feature"
+            },
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11.01, 1.01, 211],
+                        [11.02, 1.02, 411],
+                        [11.03, 1.03, 611]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 4
+                },
+                "type": "Feature"
+            }
+        ]);
+    });
+
+    test("build features - multi gradients - intermediate points without altitude", () => {
+        expect(
+            exchange.internal._buildFeatures(
+                [
+                    L.latLng(1, 11, 111),
+                    L.latLng(1.002, 11.002),
+                    L.latLng(1.004, 11.004),
+                    L.latLng(1.01, 11.01, 211),
+                    L.latLng(1.015, 11.015),
+                    L.latLng(1.02, 11.02, 411),
+                ],
+                false
+            )
+        ).toEqual([
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11, 1, 111],
+                        [11.002, 1.002, undefined],
+                        [11.004, 1.004, undefined],
+                        [11.01, 1.01, 211]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 2
+                },
+                "type": "Feature"
+            },
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11.01, 1.01, 211],
+                        [11.015, 1.015, undefined],
+                        [11.02, 1.02, 411]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 4
+                },
+                "type": "Feature"
+            }
+        ]);
+    });
+
+    test("build features - multi gradients - intermediate points without altitude - interpolate", () => {
+        expect(
+            exchange.internal._buildFeatures(
+                [
+                    L.latLng(1, 11, 111),
+                    L.latLng(1.002, 11.002),
+                    L.latLng(1.004, 11.004),
+                    L.latLng(1.01, 11.01, 211),
+                    L.latLng(1.015, 11.015),
+                    L.latLng(1.02, 11.02, 411),
+                ],
+                true
+            )
+        ).toEqual([
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11, 1, 111],
+                        [11.002, 1.002, 131],
+                        [11.004, 1.004, 151],
+                        [11.01, 1.01, 211]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 2
+                },
+                "type": "Feature"
+            },
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11.01, 1.01, 211],
+                        [11.015, 1.015, 311],
+                        [11.02, 1.02, 411]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 4
+                },
+                "type": "Feature"
+            }
+        ]);
+    });
+
+    test("build features - realistic scenario", () => {
+        expect(
+            exchange.internal._buildFeatures(
+                [
+                    L.latLng(0.999, 10.999),
+                    L.latLng(1, 11, 111),
+                    L.latLng(1.002, 11.002),
+                    L.latLng(1.004, 11.004),
+                    L.latLng(1.01, 11.01, 211),
+                    L.latLng(1.015, 11.015),
+                    L.latLng(1.02, 11.02, 411),
+                    L.latLng(1.03, 11.03, 311),
+                    L.latLng(1.04, 11.04, 311),
+                    L.latLng(1.05, 11.05, 511),
+                    L.latLng(1.06, 11.06),
+                ],
+                true
+            )
+        ).toEqual([
+            {
+                "geometry": {
+                    "coordinates": [
+                        [10.999, 0.999, 111],
+                        [11, 1, 111]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 0
+                },
+                "type": "Feature"
+            },
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11, 1, 111],
+                        [11.002, 1.002, 131],
+                        [11.004, 1.004, 151],
+                        [11.01, 1.01, 211]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 2
+                },
+                "type": "Feature"
+            },
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11.01, 1.01, 211],
+                        [11.015, 1.015, 311],
+                        [11.02, 1.02, 411]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 4
+                },
+                "type": "Feature"
+            },
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11.02, 1.02, 411],
+                        [11.03, 1.03, 311]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": -2
+                },
+                "type": "Feature"
+            },
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11.03, 1.03, 311],
+                        [11.04, 1.04, 311]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 0
+                },
+                "type": "Feature"
+            },
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11.04, 1.04, 311],
+                        [11.05, 1.05, 511]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 4
+                },
+                "type": "Feature"
+            },
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11.05, 1.05, 511],
+                        [11.06, 1.06, 511]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 0
+                },
+                "type": "Feature"
+            },
+        ]);
     });
 
     //
-    // Partition by min distance
+    // Filter coordinates with altitude
     //
+    test("filter coordinates with altitude", () => {
+        expect(exchange.internal._filterCoordinatesWithAltitude([])).toEqual([]);
 
-    test("partition by min distance - no points", () => {
-        expect(exchange.internal._partitionByMinDistance([], 100)).toEqual([]);
+        expect(
+                exchange.internal._filterCoordinatesWithAltitude([
+                        L.latLng(1, 2)
+                ])
+        ).toEqual([]);
+
+        expect(
+                exchange.internal._filterCoordinatesWithAltitude([
+                        L.latLng(1, 1),
+                        L.latLng(2, 2, 2),
+                        L.latLng(3, 3)
+                ])
+        ).toEqual([
+                { point: L.latLng(2, 2, 2), index: 1 }
+        ]);
+
+        expect(
+                exchange.internal._filterCoordinatesWithAltitude([
+                        L.latLng(1, 1),
+                        L.latLng(2, 2, 2),
+                        L.latLng(3, 3),
+                        L.latLng(4, 4, 4),
+                        L.latLng(5, 5)
+                ])
+        ).toEqual([
+                { point: L.latLng(2, 2, 2), index: 1 },
+                { point: L.latLng(4, 4, 4), index: 3 }
+        ]);
+
+        expect(
+                exchange.internal._filterCoordinatesWithAltitude([
+                        L.latLng(1, 1),
+                        L.latLng(2, 2, 2),
+                        L.latLng(2.0001, 2.0002, 2), // in fuzzy range
+                        L.latLng(3, 3),
+                        L.latLng(4, 4, 4),
+                        L.latLng(5, 5)
+                ])
+        ).toEqual([
+                { point: L.latLng(2, 2, 2), index: 1 },
+                { point: L.latLng(4, 4, 4), index: 4 }
+        ]);
+
+        expect(
+                exchange.internal._filterCoordinatesWithAltitude([
+                        L.latLng(2, 2, 2),
+                        L.latLng(2.0001, 2.0001, 2), // in fuzzy range
+                        L.latLng(2.0001, 2.0002, 2), // in fuzzy range
+                ])
+        ).toEqual([
+                { point: L.latLng(2, 2, 2), index: 0 }
+        ]);
     });
 
-    test("partition by min distance - less than min distance, all points without altitude", () => {
-        var latLngs = [
-            L.latLng(1.11111, 2.22221),
-            L.latLng(1.11112, 2.22222),
-            L.latLng(1.11113, 2.22223),
-            L.latLng(1.11114, 2.22224)
-        ];
-        // the points are about 3m apart
-        expect(exchange.internal._partitionByMinDistance(latLngs, 100))
-                .toEqual([
-                    [
-                        L.latLng(1.11111, 2.22221),
-                        L.latLng(1.11112, 2.22222),
-                        L.latLng(1.11113, 2.22223),
-                        L.latLng(1.11114, 2.22224)
-                    ]
-                ]);
+    //
+    // Has altitude
+    //
+    test("has altitude", () => {
+        expect(exchange.internal._hasAltitude(L.latLng(1, 1))).toBe(false);
+        expect(exchange.internal._hasAltitude(L.latLng(1, 1, 1))).toBe(true);
     });
 
-    test("partition by min distance - more than min distance, all points without altitude", () => {
-        var latLngs = [
-            L.latLng(1.111, 2.221),
-            L.latLng(1.112, 2.222),
-            L.latLng(1.113, 2.223),
-            L.latLng(1.114, 2.224),
-            L.latLng(1.115, 2.225)
-        ];
-        // the points are about 630m apart
-        expect(exchange.internal._partitionByMinDistance(latLngs, 200))
-                .toEqual([
-                    [
-                        L.latLng(1.111, 2.221),
-                        L.latLng(1.112, 2.222),
-                        L.latLng(1.113, 2.223),
-                        L.latLng(1.114, 2.224),
-                        L.latLng(1.115, 2.225)
-                    ]
-                ]);
-    });
+    //
+    // Is in fuzzy range
+    //
+    test("is in fuzzy range", () => {
+        // 20m
+        expect(exchange.internal._isInFuzzyRange(
+                L.latLng(1, 2),
+                L.latLng(1.0001, 2.0001))
+        ).toBe(true);
+        
+        // 30m
+        expect(exchange.internal._isInFuzzyRange(
+                L.latLng(1, 2),
+                L.latLng(1.0003, 2))
+        ).toBe(false);
 
-    test("partition by min distance - less than min distance, start points without altitude", () => {
-        var latLngs = [
-            L.latLng(1.1111, 2.2221),
-            L.latLng(1.1112, 2.2222, 10),
-            L.latLng(1.1113, 2.2223, 11),
-            L.latLng(1.1114, 2.2224, 12)
-        ];
-        // the points are about 30m apart
-        expect(exchange.internal._partitionByMinDistance(latLngs, 100))
-                .toEqual([
-                    [
-                        L.latLng(1.1111, 2.2221),
-                        L.latLng(1.1112, 2.2222, 10),
-                        L.latLng(1.1113, 2.2223, 11),
-                        L.latLng(1.1114, 2.2224, 12)
-                    ]
-                ]);
-    });
-
-    test("partition by min distance - less than min distance, end points without altitude", () => {
-        var latLngs = [
-            L.latLng(1.1111, 2.2221, 9),
-            L.latLng(1.1112, 2.2222, 10),
-            L.latLng(1.1113, 2.2223, 11),
-            L.latLng(1.1114, 2.2224)
-        ];
-        // the points are about 30m apart
-        expect(exchange.internal._partitionByMinDistance(latLngs, 100))
-                .toEqual([
-                    [
-                        L.latLng(1.1111, 2.2221, 9),
-                        L.latLng(1.1112, 2.2222, 10),
-                        L.latLng(1.1113, 2.2223, 11),
-                        L.latLng(1.1114, 2.2224)
-                    ]
-                ]);
-    });
-
-    test("partition by min distance - less than min distance, some points without altitude", () => {
-        var latLngs = [
-            L.latLng(1.1111, 2.2221, 9),
-            L.latLng(1.1112, 2.2222),
-            L.latLng(1.1113, 2.2223),
-            L.latLng(1.1114, 2.2224, 12),
-            L.latLng(1.1115, 2.2225, 13)
-        ];
-        // the points are about 30m apart
-        expect(exchange.internal._partitionByMinDistance(latLngs, 100))
-                .toEqual([
-                    [
-                        L.latLng(1.1111, 2.2221, 9),
-                        L.latLng(1.1112, 2.2222),
-                        L.latLng(1.1113, 2.2223),
-                        L.latLng(1.1114, 2.2224, 12),
-                        L.latLng(1.1115, 2.2225, 13)
-                    ]
-                ]);
-    });
-
-    test("partition by min distance - less than min distance, all points with altitude", () => {
-        var latLngs = [
-            L.latLng(1.1111, 2.2221, 9),
-            L.latLng(1.1112, 2.2222, 10),
-            L.latLng(1.1113, 2.2223, 11),
-            L.latLng(1.1114, 2.2224, 12)
-        ];
-        // the points are about 30m apart
-        expect(exchange.internal._partitionByMinDistance(latLngs, 100))
-                .toEqual([
-                    [
-                        L.latLng(1.1111, 2.2221, 9),
-                        L.latLng(1.1112, 2.2222, 10),
-                        L.latLng(1.1113, 2.2223, 11),
-                        L.latLng(1.1114, 2.2224, 12)
-                    ]
-                ]);
-    });
-
-    test("partition by min distance - more than min distance, start points without altitude", () => {
-        var latLngs = [
-            L.latLng(1.111, 2.221),
-            L.latLng(1.112, 2.222),
-            L.latLng(1.113, 2.223, 13),
-            L.latLng(1.114, 2.224, 14),
-            L.latLng(1.115, 2.225, 15),
-            // distance so far is > 200m; reset and restart with last
-            L.latLng(1.116, 2.226, 16),
-            L.latLng(1.117, 2.227, 17),
-            L.latLng(1.118, 2.228, 18)
-            // distance so far is > 200; reset
-        ];
-        expect(exchange.internal._partitionByMinDistance(latLngs, 200))
-                .toEqual([
-                    [
-                        L.latLng(1.111, 2.221),
-                        L.latLng(1.112, 2.222),
-                        L.latLng(1.113, 2.223, 13),
-                        L.latLng(1.114, 2.224, 14),
-                        L.latLng(1.115, 2.225, 15)
-                    ],
-                    [
-                        L.latLng(1.115, 2.225, 15),
-                        L.latLng(1.116, 2.226, 16),
-                        L.latLng(1.117, 2.227, 17),
-                        L.latLng(1.118, 2.228, 18)
-                    ]
-                ]);
-    });
-
-    test("partition by min distance - more than min distance, too many start points without altitude", () => {
-        var latLngs = [
-            L.latLng(1.111, 2.221),
-            L.latLng(1.112, 2.222),
-            L.latLng(1.113, 2.223),
-            L.latLng(1.114, 2.224),
-            L.latLng(1.115, 2.225, 15),
-            L.latLng(1.116, 2.226, 16),
-            L.latLng(1.117, 2.227, 17),
-            L.latLng(1.118, 2.228, 18)
-        ];
-        // distance is much more than 500m, but < 500m between points with altitude
-        expect(exchange.internal._partitionByMinDistance(latLngs, 500))
-                .toEqual([
-                    [
-                        L.latLng(1.111, 2.221),
-                        L.latLng(1.112, 2.222),
-                        L.latLng(1.113, 2.223),
-                        L.latLng(1.114, 2.224),
-                        L.latLng(1.115, 2.225, 15),
-                        L.latLng(1.116, 2.226, 16),
-                        L.latLng(1.117, 2.227, 17),
-                        L.latLng(1.118, 2.228, 18)
-                    ]
-                ]);
-    });
-
-    test("partition by min distance - more than min distance, end points without altitude", () => {
-        var latLngs = [
-            L.latLng(1.111, 2.221, 11),
-            L.latLng(1.112, 2.222, 12),
-            L.latLng(1.113, 2.223, 13),
-            // distance so far is > 200m; reset and restart with last
-            L.latLng(1.114, 2.224, 14),
-            L.latLng(1.115, 2.225, 15),
-            // distance so far is > 200m; reset
-            L.latLng(1.116, 2.226),
-            L.latLng(1.117, 2.227)
-            // last 2 points will get appended to the last segment
-        ];
-        expect(exchange.internal._partitionByMinDistance(latLngs, 200))
-                .toEqual([
-                    [
-                        L.latLng(1.111, 2.221, 11),
-                        L.latLng(1.112, 2.222, 12),
-                        L.latLng(1.113, 2.223, 13)
-                    ],
-                    [
-                        L.latLng(1.113, 2.223, 13),
-                        L.latLng(1.114, 2.224, 14),
-                        L.latLng(1.115, 2.225, 15),
-                        L.latLng(1.116, 2.226),
-                        L.latLng(1.117, 2.227)
-                    ]
-                ]);
-    });
-
-    test("partition by min distance - more than min distance, too many end points without altitude", () => {
-        var latLngs = [
-            L.latLng(1.111, 2.221, 11),
-            L.latLng(1.112, 2.222, 12),
-            L.latLng(1.113, 2.223, 13),
-            L.latLng(1.114, 2.224, 14),
-            L.latLng(1.115, 2.225),
-            L.latLng(1.116, 2.226),
-            L.latLng(1.117, 2.227)
-        ];
-        // distance is much more than 500m, but < 500m between points with altitude
-        expect(exchange.internal._partitionByMinDistance(latLngs, 500))
-                .toEqual([
-                    [
-                        L.latLng(1.111, 2.221, 11),
-                        L.latLng(1.112, 2.222, 12),
-                        L.latLng(1.113, 2.223, 13),
-                        L.latLng(1.114, 2.224, 14),
-                        L.latLng(1.115, 2.225),
-                        L.latLng(1.116, 2.226),
-                        L.latLng(1.117, 2.227)
-                    ]
-                ]);
-    });
-
-    test("partition by min distance - more than min distance, some points without altitude", () => {
-        var latLngs = [
-            L.latLng(1.111, 2.221, 11),
-            L.latLng(1.112, 2.222, 12),
-            // < 200m so far
-            L.latLng(1.113, 2.223),
-            // > 200m so far, but still < 200m between points with altitude
-            L.latLng(1.114, 2.224, 14),
-            // > 200m, all good; reset and restart with last
-            L.latLng(1.115, 2.225),
-            // < 200m so far
-            L.latLng(1.116, 2.226, 16)
-            // > 200m so far; reset and restart with last
-        ];
-        expect(exchange.internal._partitionByMinDistance(latLngs, 200))
-                .toEqual([
-                    [
-                        L.latLng(1.111, 2.221, 11),
-                        L.latLng(1.112, 2.222, 12),
-                        L.latLng(1.113, 2.223),
-                        L.latLng(1.114, 2.224, 14)
-                    ],
-                    [
-                        L.latLng(1.114, 2.224, 14),
-                        L.latLng(1.115, 2.225),
-                        L.latLng(1.116, 2.226, 16)
-                    ]
-                ]);
-    });
-
-    test("partition by min distance - more than min distance, all points with altitude, exact fit", () => {
-        var latLngs = [
-            L.latLng(1.111, 2.221, 11),
-            L.latLng(1.112, 2.222, 12),
-            // < 200m so far
-            L.latLng(1.113, 2.223, 13),
-            // > 200m so far; reset and restart with the last
-            L.latLng(1.114, 2.224, 14),
-            // < 200m
-            L.latLng(1.115, 2.225, 15)
-            // > 200m; reset
-        ];
-        expect(exchange.internal._partitionByMinDistance(latLngs, 200))
-                .toEqual([
-                    [
-                        L.latLng(1.111, 2.221, 11),
-                        L.latLng(1.112, 2.222, 12),
-                        L.latLng(1.113, 2.223, 13)
-                    ],
-                    [
-                        L.latLng(1.113, 2.223, 13),
-                        L.latLng(1.114, 2.224, 14),
-                        L.latLng(1.115, 2.225, 15)
-                    ]
-                ]);
-    });
-
-    test("partition by min distance - more than min distance, all points with altitude, extra trailing points", () => {
-        var latLngs = [
-            L.latLng(1.111, 2.221, 11),
-            L.latLng(1.112, 2.222, 12),
-            // < 200m so far
-            L.latLng(1.113, 2.223, 13),
-            // > 200m so far; reset and restart with last
-            L.latLng(1.114, 2.224, 14),
-            // < 200m
-            L.latLng(1.115, 2.225, 15),
-            // > 200m; reset and restart with last
-            L.latLng(1.116, 2.226, 16)
-            // < 200m; since it's last point, append it to last segment
-        ];
-        expect(exchange.internal._partitionByMinDistance(latLngs, 200))
-                .toEqual([
-                    [
-                        L.latLng(1.111, 2.221, 11),
-                        L.latLng(1.112, 2.222, 12),
-                        L.latLng(1.113, 2.223, 13)
-                    ],
-                    [
-                        L.latLng(1.113, 2.223, 13),
-                        L.latLng(1.114, 2.224, 14),
-                        L.latLng(1.115, 2.225, 15),
-                        L.latLng(1.116, 2.226, 16)
-                    ]
-                ]);
+        // 40m
+        expect(exchange.internal._isInFuzzyRange(
+                L.latLng(1.0001, 2.0001),
+                L.latLng(1.0003, 2.0004))
+        ).toBe(false);
+        
+        expect(exchange.internal._isInFuzzyRange(
+                L.latLng(1, 1),
+                L.latLng(2, 2))
+        ).toBe(false);
     });
 
     //
