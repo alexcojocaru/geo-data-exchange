@@ -147,18 +147,14 @@ the overall coverage at the top of the README is updated, along with the summary
 
 ## <a name="release"></a>Release
 
-#### Build a minor release
-```
-$ npm run release
-```
+#### Build a release
+Use one of the following, depending on what kind of release you need to build:
+- major release: `npm run release-major`
+- minor release: `npm run release-minor`
+- patch release: `npm run release-patch`
 
 *NB: If the release script fails to run, check that there are no files modified locally,
 in which case commit them or clean them up before running the release.*
-
-#### Build a patch release
-```
-$ npm run release-patch
-```
 
 ## Publish
 
