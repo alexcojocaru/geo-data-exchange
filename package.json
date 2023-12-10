@@ -6,9 +6,9 @@
   "scripts": {
     "test": "jest",
     "test-coverage": "jest --coverage && node resources/test-coverage-parser.js",
-    "clean-dist": "rm -rf dist",
+    "clean": "rm -rf dist",
     "minify": "uglifyjs src/index.js --compress --mangle --warn --output dist/index.min.js",
-    "build": "npm run clean-dist && npm run test-coverage && mkdir dist && cp src/index.js dist/index.js",
+    "build": "npm run clean && npm run test-coverage && mkdir dist && cp src/index.js dist/index.js",
     "release-patch": "npm run version:bump-patch --silent && npm run build",
     "release-minor": "npm run version:bump-minor --silent && npm run build",
     "release-major": "npm run version:bump-major --silent && npm run build",

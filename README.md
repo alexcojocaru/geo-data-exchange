@@ -160,13 +160,16 @@ the overall coverage at the top of the README is updated, along with the summary
 ## <a name="release"></a>Release
 
 #### Build a release
-Use one of the following, depending on what kind of release you need to build:
-- major release: `npm run release-major`
-- minor release: `npm run release-minor`
-- patch release: `npm run release-patch`
 
-*NB: If the release script fails to run, check that there are no files modified locally,
-in which case commit them or clean them up before running the release.*
+First, build the package: `npm run build`, then commit the changes.
+
+Then use one of the following commands, depending on what kind of release you need to build:
+- major release: `npm run version:bump-major`
+- minor release: `npm run version:bump-minor`
+- patch release: `npm run version:bump-patch`
+
+*NB: If the version bump script fails to run, check that there are no files modified locally,
+in which case commit them or clean them up before running the process again.*
 
 ## Publish
 
