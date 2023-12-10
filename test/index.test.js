@@ -82,6 +82,58 @@ describe("geo-data-exchange", () => {
         }]);
     });
 
+    test("build geo json features - normalize gradient", () => {
+        expect(
+            exchange.buildGeojsonFeatures(
+                [
+                    L.latLng(1, 11, 111),
+                    L.latLng(2, 22, 222),
+                    L.latLng(2.001, 22.001, 333),
+                    L.latLng(2.1, 22.1, 2220),
+                    L.latLng(2.101, 22.101, 2220),
+                ],
+                { normalize: true }
+            )
+        ).toEqual([{
+            "features": [
+                {
+                    "geometry": {
+                        "coordinates": [
+                            [11, 1, 111],
+                            [22, 2, 222],
+                        ],
+                        "type": "LineString"
+                    },
+                    "properties": {
+                        "attributeType": 0
+                    },
+                    "type": "Feature"
+                },
+                {
+                    "geometry": {
+                        "coordinates": [
+                            [22, 2, 222],
+                            [22.001, 2.001, 333],
+                            [22.1, 2.1, 2220],
+                            [22.101, 2.101, 2220]
+                        ],
+                        "type": "LineString"
+                    },
+                    "properties": {
+                        "attributeType": 4
+                    },
+                    "type": "Feature"
+                }
+            ],
+            "properties": {
+                "Creator": "github.com/alexcojocaru/geo-data-exchange",
+                "records": 2,
+                "summary": "gradient"
+            },
+            "type": "FeatureCollection"
+        }]);
+    });
+
     test("build features - empty points list", () => {
         expect(exchange.internal._buildFeatures([], false)).toEqual([]);
     });
@@ -542,6 +594,82 @@ describe("geo-data-exchange", () => {
                 },
                 "properties": {
                     "attributeType": 4
+                },
+                "type": "Feature"
+            }
+        ]);
+    });
+
+    test("build features - normalization - interpolate", () => {
+        expect(
+            exchange.internal._buildFeatures(
+                [
+                    L.latLng(1, 11, 111),
+                    L.latLng(1.002, 11.002),
+                    L.latLng(1.004, 11.004, 150),
+                    L.latLng(1.01, 11.01, 211),
+                    L.latLng(1.015, 11.015),
+                    L.latLng(1.016, 11.016, 300),
+                    L.latLng(1.02, 11.02, 411),
+                    L.latLng(1.03, 11.03, 411)
+                ],
+                true,
+                true,
+                100
+            )
+        ).toEqual([
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11, 1, 111],
+                        [11.002, 1.002, 130.5],
+                        [11.004, 1.004, 150],
+                        [11.01, 1.01, 211]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 2
+                },
+                "type": "Feature"
+            },
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11.01, 1.01, 211],
+                        [11.015, 1.015, 285.2],
+                        [11.016, 1.016, 300]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 3
+                },
+                "type": "Feature"
+            },
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11.016, 1.016, 300],
+                        [11.02, 1.02, 411]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 5
+                },
+                "type": "Feature"
+            },
+            {
+                "geometry": {
+                    "coordinates": [
+                        [11.02, 1.02, 411],
+                        [11.03, 1.03, 411]
+                    ],
+                    "type": "LineString"
+                },
+                "properties": {
+                    "attributeType": 0
                 },
                 "type": "Feature"
             }

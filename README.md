@@ -1,6 +1,6 @@
 # geo-data-exchange
 
-[![Node.js CI](https://github.com/alexcojocaru/geo-data-exchange/actions/workflows/node.js.yml/badge.svg)](https://github.com/alexcojocaru/geo-data-exchange/actions/workflows/node.js.yml) , coverage: [98%](#test-coverage-report)
+[![Node.js CI](https://github.com/alexcojocaru/geo-data-exchange/actions/workflows/node.js.yml/badge.svg)](https://github.com/alexcojocaru/geo-data-exchange/actions/workflows/node.js.yml) , coverage: [99%](#test-coverage-report)
 
 Transform a GPX or Leaflet track to GeoJSON
 
@@ -19,11 +19,23 @@ The elevation grade levels are defined
 
 Since it is quite possible that some points on the GPX track do not have an elevation
 coordinate, the track grades are calculated using only the points with elevation.
-After this, the elevation interpolation is applied (if enabled via options) as follows:
-given a point _B_ without elevation between two points _A_ and _C_ with elevation,
+
+After this, the elevation interpolation and the grade normalization are applied
+(if enabled via options) as follows:
+* _elevation interpolation_:
+Given a point _B_ without elevation between two points _A_ and _C_ with elevation,
 the algorithm calculates the gradient _GR_ between _A_ and _C_, and interpolates the elevation
 for _B_, so that the gradient between _A_ and _B_ is _GR_ and between _B_ and _C_ is also _GR_.
 This is not an accurate technique, and its results could be far from reality.
+* _grade normalization_:
+Given a track with many elevation changes within a short distance, the gradient might change
+very often.  Plotting it on a chart will result in gradient changes every few pixels,
+which makes the chart look very busy.
+The normalization algorithm takes 2 parameters: _the chart width_ (in pixels)
+and the _minimum gradient length_ (in pixel).
+As the algorithm parses the track and finds a new gradient,
+it will merge a short one (i.e. shorter than min length when rendered)
+with the subsequent one(s), so that the resulting gradient is longer than min length.
 
 <a name="feature-collection-example"></a>This is an example of how such a FeatureCollection
 looks like.  More examples of such feature collections can be found in the
@@ -88,9 +100,9 @@ First, add this module as a dependency to your project:
 ```
 $ npm install alexcojocaru/geo-data-exchange
 ```
-or, if you want a specific version/commit/branch (e.g. v2.0.0):
+or, if you want a specific version/commit/branch (e.g. v2.1.0):
 ```
-$ npm install alexcojocaru/geo-data-exchange#v2.0.0
+$ npm install alexcojocaru/geo-data-exchange#v2.1.0
 ```
 
 The main function is `buildGeojsonFeatures(latLngs, options)`
@@ -140,7 +152,7 @@ the overall coverage at the top of the README is updated, along with the summary
 <a name="test-coverage-report"></a>
 ```
   % Statements: 99
-  %   Branches: 96
+  %   Branches: 98
   %  Functions: 100
   %      Lines: 99
 ```
