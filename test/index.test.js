@@ -68,7 +68,7 @@ describe("geo-data-exchange", () => {
                         "type": "LineString"
                     },
                     "properties": {
-                        "attributeType": 4
+                        "attributeType": 13
                     },
                     "type": "Feature"
                 }
@@ -120,7 +120,7 @@ describe("geo-data-exchange", () => {
                         "type": "LineString"
                     },
                     "properties": {
-                        "attributeType": 4
+                        "attributeType": 13
                     },
                     "type": "Feature"
                 }
@@ -300,7 +300,7 @@ describe("geo-data-exchange", () => {
                     "type": "LineString"
                 },
                 "properties": {
-                    "attributeType": 4
+                    "attributeType": 13
                 },
                 "type": "Feature"
             },
@@ -354,7 +354,7 @@ describe("geo-data-exchange", () => {
                     "type": "LineString"
                 },
                 "properties": {
-                    "attributeType": 4
+                    "attributeType": 13
                 },
                 "type": "Feature"
             },
@@ -395,7 +395,7 @@ describe("geo-data-exchange", () => {
                     "type": "LineString"
                 },
                 "properties": {
-                    "attributeType": 2
+                    "attributeType": 6
                 },
                 "type": "Feature"
             }
@@ -429,7 +429,7 @@ describe("geo-data-exchange", () => {
                     "type": "LineString"
                 },
                 "properties": {
-                    "attributeType": 2
+                    "attributeType": 6
                 },
                 "type": "Feature"
             }
@@ -459,7 +459,7 @@ describe("geo-data-exchange", () => {
                     "type": "LineString"
                 },
                 "properties": {
-                    "attributeType": 2
+                    "attributeType": 6
                 },
                 "type": "Feature"
             }
@@ -487,7 +487,7 @@ describe("geo-data-exchange", () => {
                     "type": "LineString"
                 },
                 "properties": {
-                    "attributeType": 2
+                    "attributeType": 6
                 },
                 "type": "Feature"
             },
@@ -501,7 +501,7 @@ describe("geo-data-exchange", () => {
                     "type": "LineString"
                 },
                 "properties": {
-                    "attributeType": 4
+                    "attributeType": 13
                 },
                 "type": "Feature"
             }
@@ -533,7 +533,7 @@ describe("geo-data-exchange", () => {
                     "type": "LineString"
                 },
                 "properties": {
-                    "attributeType": 2
+                    "attributeType": 6
                 },
                 "type": "Feature"
             },
@@ -547,7 +547,7 @@ describe("geo-data-exchange", () => {
                     "type": "LineString"
                 },
                 "properties": {
-                    "attributeType": 4
+                    "attributeType": 13
                 },
                 "type": "Feature"
             }
@@ -579,7 +579,7 @@ describe("geo-data-exchange", () => {
                     "type": "LineString"
                 },
                 "properties": {
-                    "attributeType": 2
+                    "attributeType": 6
                 },
                 "type": "Feature"
             },
@@ -593,7 +593,7 @@ describe("geo-data-exchange", () => {
                     "type": "LineString"
                 },
                 "properties": {
-                    "attributeType": 4
+                    "attributeType": 13
                 },
                 "type": "Feature"
             }
@@ -629,7 +629,7 @@ describe("geo-data-exchange", () => {
                     "type": "LineString"
                 },
                 "properties": {
-                    "attributeType": 2
+                    "attributeType": 6
                 },
                 "type": "Feature"
             },
@@ -643,7 +643,7 @@ describe("geo-data-exchange", () => {
                     "type": "LineString"
                 },
                 "properties": {
-                    "attributeType": 3
+                    "attributeType": 9
                 },
                 "type": "Feature"
             },
@@ -656,7 +656,7 @@ describe("geo-data-exchange", () => {
                     "type": "LineString"
                 },
                 "properties": {
-                    "attributeType": 5
+                    "attributeType": 16
                 },
                 "type": "Feature"
             },
@@ -719,7 +719,7 @@ describe("geo-data-exchange", () => {
                     "type": "LineString"
                 },
                 "properties": {
-                    "attributeType": 2
+                    "attributeType": 6
                 },
                 "type": "Feature"
             },
@@ -733,7 +733,7 @@ describe("geo-data-exchange", () => {
                     "type": "LineString"
                 },
                 "properties": {
-                    "attributeType": 4
+                    "attributeType": 13
                 },
                 "type": "Feature"
             },
@@ -746,7 +746,7 @@ describe("geo-data-exchange", () => {
                     "type": "LineString"
                 },
                 "properties": {
-                    "attributeType": -2
+                    "attributeType": -6
                 },
                 "type": "Feature"
             },
@@ -772,7 +772,7 @@ describe("geo-data-exchange", () => {
                     "type": "LineString"
                 },
                 "properties": {
-                    "attributeType": 4
+                    "attributeType": 13
                 },
                 "type": "Feature"
             },
@@ -993,7 +993,7 @@ describe("geo-data-exchange", () => {
             L.latLng(2, 2, 2),
             L.latLng(2.001, 2.001, 200)
         ];
-        expect(exchange.internal._calculateGradient(latLngs)).toEqual(5);
+        expect(exchange.internal._calculateGradient(latLngs)).toEqual(16);
     });
 
     test("calculate gradient - points at end have no altitude", () => {
@@ -1002,7 +1002,7 @@ describe("geo-data-exchange", () => {
             L.latLng(2.002, 2.002, 2),
             L.latLng(3, 3)
         ];
-        expect(exchange.internal._calculateGradient(latLngs)).toEqual(-2);
+        expect(exchange.internal._calculateGradient(latLngs)).toEqual(-6);
     });
 
     test("calculate gradient - all points with altitutde", () => {
@@ -1011,7 +1011,7 @@ describe("geo-data-exchange", () => {
             L.latLng(2.001, 2.002, 19),
             L.latLng(2.002, 2.002, 20)
         ];
-        expect(exchange.internal._calculateGradient(latLngs)).toEqual(2);
+        expect(exchange.internal._calculateGradient(latLngs)).toEqual(5);
     });
 
     test("calculate gradient - some points with altitutde", () => {
@@ -1023,7 +1023,7 @@ describe("geo-data-exchange", () => {
             L.latLng(2.002, 2.002, 20),
             L.latLng(3, 3)
         ];
-        expect(exchange.internal._calculateGradient(latLngs)).toEqual(2);
+        expect(exchange.internal._calculateGradient(latLngs)).toEqual(6);
     });
 
     test("calculate gradient - duplicate points", () => {
@@ -1255,38 +1255,38 @@ describe("geo-data-exchange", () => {
         expect(exchange.internal._mapGradient(NaN)).toEqual(0);
         expect(exchange.internal._mapGradient(0)).toEqual(0);
 
-        expect(exchange.internal._mapGradient(-100)).toEqual(-5);
-        expect(exchange.internal._mapGradient(-16)).toEqual(-5);
+        expect(exchange.internal._mapGradient(-100)).toEqual(-16);
+        expect(exchange.internal._mapGradient(-16)).toEqual(-16);
 
-        expect(exchange.internal._mapGradient(-15.5)).toEqual(-4);
-        expect(exchange.internal._mapGradient(-12)).toEqual(-4);
-        expect(exchange.internal._mapGradient(-10)).toEqual(-4);
+        expect(exchange.internal._mapGradient(-15.5)).toEqual(-15);
+        expect(exchange.internal._mapGradient(-12)).toEqual(-12);
+        expect(exchange.internal._mapGradient(-10)).toEqual(-10);
 
-        expect(exchange.internal._mapGradient(-9.5)).toEqual(-3);
-        expect(exchange.internal._mapGradient(-7)).toEqual(-3);
+        expect(exchange.internal._mapGradient(-9.5)).toEqual(-9);
+        expect(exchange.internal._mapGradient(-7)).toEqual(-7);
 
-        expect(exchange.internal._mapGradient(-6.5)).toEqual(-2);
-        expect(exchange.internal._mapGradient(-4)).toEqual(-2);
+        expect(exchange.internal._mapGradient(-6.5)).toEqual(-6);
+        expect(exchange.internal._mapGradient(-4)).toEqual(-4);
 
         expect(exchange.internal._mapGradient(-1.1)).toEqual(-1);
         expect(exchange.internal._mapGradient(-1)).toEqual(-1);
 
-        expect(exchange.internal._mapGradient(-0.9)).toEqual(0);
-        expect(exchange.internal._mapGradient(0.9)).toEqual(0);
+        expect(exchange.internal._mapGradient(-0.9)).toEqual(-1);
+        expect(exchange.internal._mapGradient(0.9)).toEqual(1);
 
         expect(exchange.internal._mapGradient(1)).toEqual(1);
-        expect(exchange.internal._mapGradient(3.9)).toEqual(1);
+        expect(exchange.internal._mapGradient(3.9)).toEqual(4);
 
-        expect(exchange.internal._mapGradient(4.1)).toEqual(2);
-        expect(exchange.internal._mapGradient(6.9)).toEqual(2);
+        expect(exchange.internal._mapGradient(4.1)).toEqual(4);
+        expect(exchange.internal._mapGradient(6.9)).toEqual(7);
 
-        expect(exchange.internal._mapGradient(7)).toEqual(3);
-        expect(exchange.internal._mapGradient(9.9)).toEqual(3);
+        expect(exchange.internal._mapGradient(7)).toEqual(7);
+        expect(exchange.internal._mapGradient(9.9)).toEqual(10);
 
-        expect(exchange.internal._mapGradient(10.1)).toEqual(4);
-        expect(exchange.internal._mapGradient(15.9)).toEqual(4);
+        expect(exchange.internal._mapGradient(10.1)).toEqual(10);
+        expect(exchange.internal._mapGradient(15.9)).toEqual(16);
 
-        expect(exchange.internal._mapGradient(16)).toEqual(5);
-        expect(exchange.internal._mapGradient(100)).toEqual(5);
+        expect(exchange.internal._mapGradient(16)).toEqual(16);
+        expect(exchange.internal._mapGradient(100)).toEqual(16);
     });
 });

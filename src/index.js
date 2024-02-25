@@ -482,30 +482,15 @@
      * Map a gradient percentage to one of the gradient levels.
      */
     function _mapGradient(gradientPercentage) {
-        if (gradientPercentage <= -16) {
-            return -5;
-        } else if (gradientPercentage > -16 && gradientPercentage <= -10) {
-            return -4;
-        } else if (gradientPercentage > -10 && gradientPercentage <= -7) {
-            return -3;
-        } else if (gradientPercentage > -7 && gradientPercentage <= -4) {
-            return -2;
-        } else if (gradientPercentage > -4 && gradientPercentage <= -1) {
-            return -1;
-        } else if (gradientPercentage > -1 && gradientPercentage < 1) {
-            return 0;
-        } else if (gradientPercentage >= 1 && gradientPercentage < 4) {
-            return 1;
-        } else if (gradientPercentage >= 4 && gradientPercentage < 7) {
-            return 2;
-        } else if (gradientPercentage >= 7 && gradientPercentage < 10) {
-            return 3;
-        } else if (gradientPercentage >= 10 && gradientPercentage < 16) {
-            return 4;
-        } else if (gradientPercentage >= 16) {
-            return 5;
+        var gradient = Math.round(gradientPercentage);
+        if (gradient < -16) {
+            return -16;
+        } else if (gradient > 16) {
+            return 16;
+        } else if (gradient >= -16 && gradient <= 16) {
+            return gradient;
         } else {
-            console.log("Unknown gradientPercentage: ", gradientPercentage, "; cannot map");
+            console.log("Unknown gradientPercentage: ", gradientPercentage);
             return 0;
         }
     };
