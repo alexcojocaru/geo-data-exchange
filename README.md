@@ -152,7 +152,7 @@ the overall coverage at the top of the README is updated, along with the summary
 <a name="test-coverage-report"></a>
 ```
   % Statements: 99
-  %   Branches: 98
+  %   Branches: 97
   %  Functions: 100
   %      Lines: 99
 ```
